@@ -68,6 +68,7 @@ abstract class Command extends Argument {
   String? valueHelp;
 
   final List<Option> _options = [];
+  List<Option> get options => _options;
 
   UnmodifiableListView<Option> get option => UnmodifiableListView(_options.toSet());
 
