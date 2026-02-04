@@ -7,7 +7,7 @@ import 'arguments.dart';
 
 class CommandRunner {
 
-  CommandRunner({this.onError});
+  CommandRunner({this.onOutput, this.onError});
 
   final Map<String, Command> _commands = <String, Command>{};
 
@@ -17,22 +17,26 @@ class CommandRunner {
   // Define the onError property.
   FutureOr<void> Function(Object)? onError;
 
+  // Define the output property.
+  FutureOr<void> Function(String)? onOutput;
+
+
   Future<void> run(List<String> input) async {
     try {
       final ArgResults results = parse(input);
       if (results.command != null) {
         Object? output = await results.command!.run(results);
-        print(output.toString());
+        if (onOutput != null) {
+          await onOutput!(output.toString());
+        } else {
+          print(output.toString());
+        }
       }
-    } catch (e) {
-      if (onError != null) {
-        onError!(e);
-      } else {
-        rethrow;
-      }
+    } on Exception catch (e) {
+      print(e);
     }
-
   }
+
 
   void addCommand(Command command) {
     // TODO: handle error (Commands can't have names that conflict)
